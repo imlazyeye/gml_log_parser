@@ -17,13 +17,11 @@ macro_rules! check {
                 ("ScriptFile", "ScriptFile"),
                 ("ScriptFunction", "ScriptFile"),
                 ("ObjObject", "ObjObject"),
-
-                 // Snakes
+                // Snakes
                 ("script_file", "script_file"),
                 ("script_function", "script_file"),
                 ("obj_object", "obj_object"),
-
-                 // Odd underscores
+                // Odd underscores
                 ("___scriptfile", "___scriptfile"),
                 ("_script__function_", "___scriptfile"),
                 ("__obj__object", "__obj__object"),
@@ -35,7 +33,7 @@ macro_rules! check {
             let toks: Vec<chompy::lex::Tok<crate::tok::TokKind>> = lexer
                 .collect::<std::result::Result<_, chompy::lex::LexError>>()
                 .unwrap();
-            assert_eq!(
+            pretty_assertions::assert_eq!(
                 crate::parse::parse(toks, script_mappings),
                 Some($expected.to_string())
             );
@@ -49,11 +47,15 @@ check!(
 );
 check!(
     global_script_by_name,
-    "gml_Script_ScriptFunction:102" => "scripts/ScriptFile/ScriptFile.gml::102"
+    "gml_Script_ScriptFunction:102" => "scripts/ScriptFile/ScriptFile.gml:102"
 );
 check!(
     constructor_method,
     "gml_Script_method@ScriptFunction_ScriptFile:296" => "scripts/ScriptFile/ScriptFile.gml:296"
+);
+check!(
+    utter_nonsense,
+    "gml_Script_foo_bar_bee@anon@3215@anon@5923@__struct__542_ScriptFunction_ScriptFile:296" => "scripts/ScriptFile/ScriptFile.gml:296"
 );
 check!(
     anon_fn_in_constructor_method,

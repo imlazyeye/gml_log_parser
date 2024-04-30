@@ -43,6 +43,8 @@ pub fn parse(
         return panic!("Failed on {}", kind);
     }
 
+    const OBJECT_FILES: &[&str] = &["Create_0", "Step_0", "Step_1", "Step_2"];
+
     println!("input: {:?}", toks.iter().map(|v| v.to_string()).join(""));
 
     // Reverse the stream
@@ -76,13 +78,11 @@ pub fn parse(
         "filtered: {:?}",
         toks.iter().map(|v| v.to_string()).join("")
     );
-    toks.reverse();
-    println!("revd: {:?}", toks.iter().map(|v| v.to_string()).join(""));
-
-    // The underscore from gml_
-    require(TokKind::Underscore, &mut toks).unwrap();
 
     // Now we figure out what kind of source we're working with
+    require(TokKind::Gml, &mut toks).unwrap();
+    require(TokKind::Underscore, &mut toks).unwrap();
+
     if match_take(TokKind::Script, &mut toks).is_some() {
         require(TokKind::Underscore, &mut toks).unwrap();
 
@@ -90,9 +90,10 @@ pub fn parse(
         // find is the winner.
         let mut possibilities = vec![];
         let mut working_name = String::new();
-        while let Some(tok) = toks.iter().rev().next() {
-            working_name = format!("{}{working_name}", toks.remove(0));
-            println!("{working_name}");
+        toks.reverse();
+        for tok in toks {
+            working_name = format!("{}{working_name}", tok);
+            println!("working_name: {working_name}");
             if let Some(script) = script_mappings.get(&working_name) {
                 possibilities.push(script);
             }
@@ -104,8 +105,39 @@ pub fn parse(
             panic!()
         }
     } else if match_take(TokKind::Object, &mut toks).is_some() {
-        // EXAMPLE: Object_Setup_Create_0
-        todo!()
+        require(TokKind::Underscore, &mut toks).unwrap();
+        toks.reverse();
+
+        // Find an event name
+        let mut event = String::new();
+        while let Some(tok) = toks.first() {
+            let tok = toks.remove(0);
+            event = format!("{}{event}", tok);
+            // println!("working_name: {working_name}");
+            if OBJECT_FILES.contains(&event.as_ref()) {
+                break;
+            }
+        }
+
+        println!("event: {event}");
+
+        println!("{}", toks.iter().join(""));
+
+        // Find an object name
+        require(TokKind::Underscore, &mut toks).unwrap();
+        let mut obj = String::new();
+        for tok in toks {
+            if tok.kind() == TokKind::Object {
+                break;
+            }
+
+            obj = format!("{}{obj}", tok);
+            println!("obj: {obj}");
+        }
+
+        println!("obj: {obj}");
+
+        return Some(format!("objects/{obj}/{event}.gml:{line_number}"));
     } else {
         panic!(); // what?
     }

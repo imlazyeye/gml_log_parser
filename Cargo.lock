@@ -166,6 +166,7 @@ version = "0.1.0"
 dependencies = [
  "chompy",
  "itertools 0.12.1",
+ "pretty_assertions",
 ]
 
 [[package]]

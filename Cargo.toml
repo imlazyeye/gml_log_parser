@@ -11,3 +11,4 @@ edition = "2021"
 [dependencies]
 chompy = { git = "https://github.com/imlazyeye/chompy" }
 itertools = "0.12"
+pretty_assertions = "1.4"
