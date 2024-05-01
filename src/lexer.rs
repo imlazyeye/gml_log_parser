@@ -1,11 +1,7 @@
-use chompy::lex::{Token, TokenKind};
 use chompy::{
-    diagnostics::Result,
     lex::{CharStream, Lex, LexError, Tok},
     utils::*,
 };
-use std::collections::HashMap;
-use std::fmt::Display;
 
 use crate::TokKind;
 
@@ -61,13 +57,21 @@ impl Lex<Tok<TokKind>, TokKind> for Lexer {
     fn lex(&mut self) -> std::result::Result<Option<Tok<TokKind>>, LexError> {
         let start_pos = self.char_stream.position();
 
-        let kind = if let Some(num) = self.construct_integer(false) {
-            TokKind::Number(num)
-        } else if let Some(ident) = self.construct_ident() {
+        let kind = if let Some(ident) = self.construct_ident() {
             match ident {
-                "gml" => TokKind::Gml,
-                "Script" => TokKind::Script,
-                "Object" => TokKind::Object,
+                "gml" if self.chomp_pattern("_Object_") => TokKind::ObjectMarker,
+                "gml" if self.chomp_pattern("_Script_") => TokKind::ScriptMarker,
+                lexeme
+                    if GML_EVENTS.contains(&lexeme)
+                        && self.char_stream.match_peek('_')
+                        && self.char_stream.peek_while(|v| v.is_numeric()) =>
+                {
+                    self.char_stream.chomp_peeks();
+                    TokKind::EventName(
+                        self.char_stream
+                            .slice(start_pos..self.char_stream.position()),
+                    )
+                }
                 lexeme => TokKind::Ident(lexeme),
             }
         } else {
@@ -75,15 +79,18 @@ impl Lex<Tok<TokKind>, TokKind> for Lexer {
                 return Ok(None);
             };
             match chr {
-                '@' => TokKind::At,
                 '_' => TokKind::Underscore,
-                ':' => TokKind::Colon,
-                invalid => {
-                    // this is chill, I promise
-                    let tmp = Box::leak(Box::new([0u8; 4]));
-                    let invalid = invalid.encode_utf8(tmp);
-                    TokKind::Invalid(invalid)
+                ':' => {
+                    let number = self.construct_integer(false).unwrap();
+                    TokKind::LineNumber(number as u64)
                 }
+                '(' if self.chomp_pattern("line ") => {
+                    let number = self.construct_integer(false).unwrap();
+                    self.chomp(); // )
+                    TokKind::LineNumber(number as u64)
+                }
+                chr if chr.is_whitespace() => return self.lex(),
+                invalid => TokKind::Invalid(invalid),
             }
         };
 
@@ -96,3 +103,16 @@ impl Lex<Tok<TokKind>, TokKind> for Lexer {
         )))
     }
 }
+
+const GML_EVENTS: &[&str] = &[
+    "Alarm",
+    "CleanUp",
+    "Create",
+    "Destroy",
+    "Draw",
+    "Gesture",
+    "Keyboard",
+    "KeyRelease",
+    "Other",
+    "Step",
+];

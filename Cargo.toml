@@ -5,9 +5,7 @@ edition = "2021"
 
 [lib]
 
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 chompy = { git = "https://github.com/imlazyeye/chompy" }
 itertools = "0.12"

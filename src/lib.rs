@@ -6,15 +6,14 @@
 #![warn(clippy::todo)]
 #![warn(clippy::unimplemented)]
 #![warn(clippy::undocumented_unsafe_blocks)]
+#![warn(clippy::panic)]
 
 mod lexer;
-mod tok;
 mod parse;
-use chompy::lex::Tok;
+mod tok;
 pub use lexer::*;
-pub use tok::*;
 pub use parse::*;
+pub use tok::*;
 
 #[cfg(test)]
 mod tests;
-
