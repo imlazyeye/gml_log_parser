@@ -1,14 +1,11 @@
+use crate::lexer::Lexer;
+use crate::tok::TokKind;
 use chompy::diagnostics::{Builder, Result};
 use chompy::lex::Tok;
 use chompy::utils::Location;
 use std::collections::HashMap;
 
-use crate::TokKind;
-
-pub fn parse(
-    mut toks: Vec<Tok<TokKind>>,
-    script_mappings: HashMap<String, String>,
-) -> Result<String> {
+pub fn parse(source: &str, script_mappings: &HashMap<String, String>) -> Result<String> {
     fn take(toks: &mut Vec<Tok<TokKind>>) -> Result<TokKind> {
         if !toks.is_empty() {
             Ok(toks.remove(0).kind)
@@ -16,6 +13,12 @@ pub fn parse(
             Err(ParseError("unexpected end".into()).into())
         }
     }
+
+    // Lex the input
+    let lexer = Lexer::new(Box::leak(Box::new(source.to_string())), 0); // hm.
+    let mut toks: Vec<Tok<TokKind>> = lexer
+        .collect::<std::result::Result<_, chompy::lex::LexError>>()
+        .unwrap();
 
     // The first token tells us what this is
     let marker = take(&mut toks)?;
@@ -63,7 +66,6 @@ pub fn parse(
     }
 }
 
-#[derive(Debug)]
 struct ParseError(String);
 chompy::define_error!(
     ParseError {
