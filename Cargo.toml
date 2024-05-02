@@ -12,7 +12,7 @@ readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
-chompy = { path = "../chompy" }
+chompy = "0.1.0"
 itertools = "0.12"
 pretty_assertions = "1.4"
 walkdir = "2.5"

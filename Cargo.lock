@@ -32,6 +32,8 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "chompy"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e6dc9ddb0f8cec1d17ba2c90ff2fb517de9fcfbe90d45bcc2c63a488530ad427"
 dependencies = [
  "codespan-reporting",
  "hashbrown",
