@@ -3,23 +3,25 @@ macro_rules! check {
         #[cfg(test)]
         #[test]
         fn $name() {
-            let script_mappings: std::collections::HashMap<String, String> = vec![
-                // Pascals
-                ("ScriptFile", "ScriptFile"),
-                ("ScriptFunction", "ScriptFile"),
-                ("ObjObject", "ObjObject"),
-                // Snakes
-                ("script_file", "script_file"),
-                ("script_function", "script_file"),
-                ("obj_object", "obj_object"),
-                // Odd underscores
-                ("___scriptfile", "___scriptfile"),
-                ("_script__function_", "___scriptfile"),
-                ("__obj__object", "__obj__object"),
-            ]
-            .into_iter()
-            .map(|(a, b)| (a.to_string(), b.to_string()))
-            .collect();
+            let script_mappings = crate::ScriptMappings::new(
+                vec![
+                    // Pascals
+                    ("ScriptFile", "ScriptFile"),
+                    ("ScriptFunction", "ScriptFile"),
+                    ("ObjObject", "ObjObject"),
+                    // Snakes
+                    ("script_file", "script_file"),
+                    ("script_function", "script_file"),
+                    ("obj_object", "obj_object"),
+                    // Odd underscores
+                    ("___scriptfile", "___scriptfile"),
+                    ("_script__function_", "___scriptfile"),
+                    ("__obj__object", "__obj__object"),
+                ]
+                .into_iter()
+                .map(|(a, b)| (a.to_string(), b.to_string()))
+                .collect()
+            );
             $(
                 pretty_assertions::assert_eq!(
                     crate::parse::parse($source.into(), &script_mappings).unwrap(),
@@ -41,13 +43,19 @@ check!(
     "gml_Script_ScriptFunction:102" => "scripts/ScriptFile/ScriptFile.gml:102:0",
     "gml_Script_script_function:102" => "scripts/script_file/script_file.gml:102:0",
     "gml_Script__script__function_:102" => "scripts/___scriptfile/___scriptfile.gml:102:0",
-    
+
 );
 check!(
     constructor_method,
     "gml_Script_method@ScriptFunction_ScriptFile:296" => "scripts/ScriptFile/ScriptFile.gml:296:0",
     "gml_Script_method@script_function_script_file:296" => "scripts/script_file/script_file.gml:296:0",
     "gml_Script_method@_script__function____scriptfile:296" => "scripts/___scriptfile/___scriptfile.gml:296:0",
+);
+check!(
+    object_method,
+    "gml_Script_ObjectFunction@gml_Object_ObjObject_Create_0:273" => "objects/ObjObject/ObjObject.gml:273:0",
+    "gml_Script_object_function@gml_Object_obj_object_Create_0:273" => "objects/obj_object/obj_object.gml:273:0",
+    "gml_Script_object_function@gml_Object___obj__object_Create_0:273" => "objects/__obj__object/__obj__object.gml:273:0"
 );
 check!(
     utter_nonsense,

@@ -10,3 +10,5 @@ edition = "2021"
 chompy = { path = "../chompy" }
 itertools = "0.12"
 pretty_assertions = "1.4"
+walkdir = "2.5"
+regex = "1.10"

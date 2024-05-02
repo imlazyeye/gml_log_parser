@@ -10,9 +10,11 @@
 
 mod lexer;
 mod parse;
+mod script_mappings;
 mod tok;
 pub use lexer::*;
 pub use parse::*;
+pub use script_mappings::*;
 pub use tok::*;
 
 #[cfg(test)]
