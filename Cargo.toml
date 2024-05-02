@@ -2,6 +2,11 @@
 name = "gml_log_parser"
 version = "0.1.0"
 edition = "2021"
+authors = ["Gabe Weiner <imlazyeye@gmail.com>"]
+description = "A small library for parsing the convoluted callstacks GameMaker outputs and translating them into VSC-friendly paths to the file/line in question"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/imlazyeye/gml_log_parser"
+readme = "README.md"
 
 [lib]
 
