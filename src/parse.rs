@@ -7,8 +7,7 @@ use chompy::utils::Location;
 use regex::Regex;
 
 pub fn parse(source: &str, script_mappings: &ScriptMappings) -> Option<String> {
-    let log_regex =
-        Regex::new(r"gml_(?:Object|Script).+?(?::\d+|\(line \d+\))").unwrap();
+    let log_regex = Regex::new(r"gml_(?:Object|Script).+?(?::\d+|\(line \d+\))").unwrap();
     log_regex.find(source).map(|v| v.as_str()).and_then(|log| {
         parse_log(log, script_mappings)
             .ok()
@@ -71,7 +70,6 @@ pub fn parse_log(source: &str, script_mappings: &ScriptMappings) -> Result<Strin
     }
 }
 
-#[derive(Debug)]
 struct ParseError(String);
 chompy::define_error!(
     ParseError {
